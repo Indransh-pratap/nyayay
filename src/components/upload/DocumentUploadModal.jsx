@@ -160,17 +160,17 @@ export function DocumentUploadModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-2xl rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl space-y-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+      <div className="relative w-full max-w-2xl rounded-xl border border-white/10 bg-[#0D1320] p-5 sm:p-6 shadow-2xl space-y-5">
         
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div className="flex items-center justify-between border-b border-white/10 pb-3.5">
           <div className="flex items-center gap-3">
-            <div className="rounded-xl bg-amber-500/15 p-2.5 text-amber-400 border border-amber-500/30">
-              <UploadCloud className="h-6 w-6" />
+            <div className="rounded-lg bg-[#070B14] p-2 text-[#D9A441] border border-[#D9A441]/30">
+              <UploadCloud className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-lg font-serif font-bold text-white">
+              <h2 className="text-base sm:text-lg font-serif font-bold text-white">
                 Upload Indian Legal Document
               </h2>
               <p className="text-xs text-slate-400">
@@ -181,7 +181,7 @@ export function DocumentUploadModal({
           {!isProcessing && (
             <button
               onClick={onClose}
-              className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+              className="rounded-lg p-1.5 text-slate-400 hover:bg-[#121A29] hover:text-white transition-colors"
             >
               <X className="h-5 w-5" />
             </button>
@@ -190,54 +190,54 @@ export function DocumentUploadModal({
 
         {/* Processing View */}
         {isProcessing ? (
-          <div className="py-6 space-y-6 animate-fade-in">
+          <div className="py-5 space-y-5 animate-fade-in">
             <div className="text-center space-y-2">
-              <div className="inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400">
-                <Loader2 className="h-7 w-7 animate-spin" />
+              <div className="inline-flex items-center justify-center h-12 w-12 rounded-xl bg-[#070B14] border border-[#D9A441]/40 text-[#D9A441]">
+                <Loader2 className="h-6 w-6 animate-spin" />
               </div>
-              <h3 className="text-base font-serif font-bold text-white">
+              <h3 className="text-sm sm:text-base font-serif font-bold text-white">
                 Analyzing Document & Grounding in Indian Law...
               </h3>
-              <p className="text-xs text-slate-400 max-w-md mx-auto">
+              <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
                 Cross-referencing statutory sections with Bharatiya Nyaya Sanhita, Indian Contract Act & Supreme Court law reports.
               </p>
             </div>
 
             {/* Progress Bar */}
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-mono text-slate-400">
                 <span>Indexing Progress</span>
-                <span className="text-amber-400 font-bold">{progressPercent}%</span>
+                <span className="text-[#D9A441] font-bold">{progressPercent}%</span>
               </div>
-              <div className="h-2 w-full rounded-full bg-slate-800 overflow-hidden">
+              <div className="h-1.5 w-full rounded-full bg-[#070B14] overflow-hidden">
                 <div 
-                  className="h-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all duration-500 ease-out"
+                  className="h-full bg-[#D9A441] transition-all duration-500 ease-out"
                   style={{ width: `${progressPercent}%` }}
                 ></div>
               </div>
             </div>
 
             {/* Stepper Pipeline */}
-            <div className="space-y-3 pt-2">
+            <div className="space-y-2.5 pt-1">
               {steps.map((step, idx) => {
                 const isDone = currentStep > idx || progressPercent === 100;
                 const isCurrent = currentStep === idx && progressPercent < 100;
                 return (
                   <div 
                     key={idx}
-                    className={`flex items-start gap-3 p-3 rounded-xl border transition-all ${
+                    className={`flex items-start gap-3 p-3 rounded-lg border transition-all ${
                       isDone 
-                        ? 'border-emerald-500/30 bg-emerald-500/5 text-slate-200' 
+                        ? 'border-emerald-500/25 bg-[#070B14] text-slate-200' 
                         : isCurrent
-                        ? 'border-amber-500/40 bg-amber-500/10 text-white shadow-sm'
-                        : 'border-slate-800/60 bg-slate-950/40 text-slate-400'
+                        ? 'border-[#D9A441]/40 bg-[#070B14] text-white shadow-sm'
+                        : 'border-white/5 bg-[#070B14]/40 text-slate-500'
                     }`}
                   >
                     <div className="mt-0.5 flex-shrink-0">
                       {isDone ? (
                         <CheckCircle2 className="h-4 w-4 text-emerald-400" />
                       ) : isCurrent ? (
-                        <Loader2 className="h-4 w-4 text-amber-400 animate-spin" />
+                        <Loader2 className="h-4 w-4 text-[#D9A441] animate-spin" />
                       ) : (
                         <div className="h-4 w-4 rounded-full border border-slate-700"></div>
                       )}
@@ -246,9 +246,9 @@ export function DocumentUploadModal({
                       <div className="text-xs font-semibold flex items-center justify-between">
                         <span>{step.label}</span>
                         {isDone && <span className="text-[10px] text-emerald-400 font-mono">COMPLETE</span>}
-                        {isCurrent && <span className="text-[10px] text-amber-400 font-mono animate-pulse">PROCESSING...</span>}
+                        {isCurrent && <span className="text-[10px] text-[#D9A441] font-mono animate-pulse">PROCESSING...</span>}
                       </div>
-                      <div className="text-[11px] text-slate-400 mt-0.5">
+                      <div className="text-[11px] text-slate-400 mt-0.5 font-mono">
                         {step.detail}
                       </div>
                     </div>
@@ -260,13 +260,13 @@ export function DocumentUploadModal({
           </div>
         ) : (
           /* Normal Upload / Preset Selection View */
-          <div className="space-y-6">
+          <div className="space-y-5">
             
             {/* Drag & Drop Area */}
             <div
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleDrop}
-              className="group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-700 bg-slate-950/50 p-8 text-center hover:border-amber-500 hover:bg-slate-950 transition-all cursor-pointer"
+              className="group relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-white/15 bg-legal-canvas p-8 text-center hover:border-gold-primary/60 transition-all cursor-pointer"
             >
               <input
                 type="file"
@@ -274,34 +274,34 @@ export function DocumentUploadModal({
                 onChange={(e) => e.target.files && setSelectedFile(e.target.files[0])}
                 className="absolute inset-0 opacity-0 cursor-pointer"
               />
-              <div className="rounded-2xl bg-slate-800/80 p-4 text-amber-400 border border-slate-700 group-hover:scale-110 transition-transform">
+              <div className="rounded-xl bg-legal-surface p-4 text-gold-primary border border-white/10 group-hover:scale-105 transition-transform">
                 <FileText className="h-8 w-8" />
               </div>
-              <p className="mt-3 text-sm font-semibold text-white">
+              <p className="mt-4 text-[15px] sm:text-[16px] font-semibold text-white">
                 {selectedFile ? selectedFile.name : "Drag and drop your legal document here"}
               </p>
-              <p className="mt-1 text-xs text-slate-400">
+              <p className="mt-1 text-[13px] text-slate-400">
                 Supports PDF, DOCX, or Scanned Petitions up to 50MB
               </p>
-              <div className="mt-4 flex items-center gap-2 text-[11px] text-emerald-400">
-                <ShieldCheck className="h-3.5 w-3.5" />
-                <span>Encrypted & privileged under Indian Evidence Act § 126</span>
+              <div className="mt-3 flex items-center gap-1.5 text-xs text-emerald-400">
+                <ShieldCheck className="h-4 w-4" />
+                <span>Privileged under Indian Evidence Act § 126</span>
               </div>
             </div>
 
             {/* Custom file process CTA */}
             {selectedFile && (
-              <div className="flex items-center justify-between p-3.5 rounded-xl border border-amber-500/40 bg-amber-500/10 animate-fade-in">
-                <div className="flex items-center gap-2.5">
-                  <FileCheck className="h-5 w-5 text-amber-400" />
+              <div className="flex items-center justify-between p-4 rounded-xl border border-gold-primary/40 bg-legal-canvas animate-fade-in">
+                <div className="flex items-center gap-3">
+                  <FileCheck className="h-6 w-6 text-gold-primary" />
                   <div>
-                    <div className="text-xs font-semibold text-white">{selectedFile.name}</div>
-                    <div className="text-[11px] text-slate-400">{(selectedFile.size / (1024 * 1024)).toFixed(2)} MB • Ready for OCR & Legal Indexing</div>
+                    <div className="text-[14px] font-semibold text-white truncate max-w-xs">{selectedFile.name}</div>
+                    <div className="text-xs text-slate-400">{(selectedFile.size / (1024 * 1024)).toFixed(2)} MB · Ready for OCR & Legal Indexing</div>
                   </div>
                 </div>
                 <button
                   onClick={() => handleStartProcessing(null)}
-                  className="rounded-lg bg-amber-500 px-4 py-2 text-xs font-semibold text-slate-950 hover:bg-amber-400 transition-colors shadow-md"
+                  className="rounded-lg bg-gold-primary px-5 py-2 text-[14px] font-semibold text-[#070B14] hover:bg-gold-hover transition-colors shadow-sm"
                 >
                   Start Analysis →
                 </button>
@@ -310,30 +310,30 @@ export function DocumentUploadModal({
 
             {/* Quick-Pick Verified Sample Legal Documents */}
             <div className="space-y-3 pt-2">
-              <div className="flex items-center justify-between text-xs text-slate-400">
-                <span className="font-semibold uppercase tracking-wider text-[11px] text-slate-300">
-                  Or Test Instantly With Verified Sample Documents:
+              <div className="flex items-center justify-between text-[13px] text-slate-400">
+                <span className="font-medium uppercase tracking-wider text-xs text-slate-400">
+                  Or load a sample brief:
                 </span>
-                <span className="text-[11px] text-amber-400">1-Click Load</span>
+                <span className="text-xs text-gold-primary font-mono">1-Click Load</span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {sampleDocs.map((sample) => (
                   <button
                     key={sample.id}
                     onClick={() => handleStartProcessing(sample)}
-                    className="flex items-start gap-2.5 rounded-xl border border-slate-800 bg-slate-950/60 p-3 text-left hover:border-amber-500/50 hover:bg-slate-900 transition-all group"
+                    className="flex items-start gap-3 rounded-xl border border-white/10 bg-legal-canvas p-3.5 text-left hover:border-gold-primary/40 hover:bg-legal-surface-elevated transition-all group"
                   >
-                    <div className="rounded-lg bg-slate-800 p-2 text-amber-400 group-hover:bg-amber-500/20 transition-colors flex-shrink-0">
+                    <div className="rounded-lg bg-legal-surface p-2 text-gold-primary group-hover:text-gold-hover transition-colors flex-shrink-0">
                       <Scale className="h-4 w-4" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-xs font-semibold text-slate-200 group-hover:text-amber-300 truncate">
+                      <div className="text-[14px] font-semibold text-slate-200 group-hover:text-white truncate">
                         {sample.title}
                       </div>
-                      <div className="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1.5">
+                      <div className="text-xs text-slate-400 mt-1 flex items-center gap-2">
                         <span>{sample.documentType}</span>
-                        <span>•</span>
+                        <span>·</span>
                         <span className="text-emerald-400">{sample.groundingConfidence}% Grounded</span>
                       </div>
                     </div>
@@ -349,3 +349,5 @@ export function DocumentUploadModal({
     </div>
   );
 }
+
+export default DocumentUploadModal;

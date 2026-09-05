@@ -66,20 +66,25 @@ ${document.clauseRisks.map((c) => `### ${c.clauseName} (${c.riskLevel} RISK)
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in no-print">
-      <div className="relative w-full max-w-3xl rounded-2xl border border-slate-800 bg-slate-900 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in no-print">
+      <div className="relative w-full max-w-3xl rounded-xl border border-white/10 bg-legal-surface shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
         
         {/* Modal Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950 px-6 py-4">
-          <div className="flex items-center gap-2.5">
-            <div className="rounded-xl bg-amber-500/15 p-2 text-amber-400 border border-amber-500/30">
+        <div className="flex items-center justify-between border-b border-white/10 bg-legal-canvas px-6 py-4">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-gold-primary/10 p-2 text-gold-primary border border-gold-primary/25">
               <FileText className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-base font-serif font-bold text-white">
-                Export AI Legal Opinion & Risk Audit
-              </h2>
-              <p className="text-xs text-slate-400">
+              <div className="flex items-center gap-2">
+                <h2 className="text-base font-serif font-bold text-white tracking-tight">
+                  Export AI Legal Opinion & Risk Audit
+                </h2>
+                <span className="text-[10px] font-mono text-gold-primary bg-gold-primary/10 border border-gold-primary/20 px-1.5 py-0.5 rounded uppercase font-semibold">
+                  Chamber Memo
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 mt-0.5">
                 Formal legal memo formatted for advocate chamber review & corporate circulation
               </p>
             </div>
@@ -88,21 +93,21 @@ ${document.clauseRisks.map((c) => `### ${c.clauseName} (${c.riskLevel} RISK)
           <div className="flex items-center gap-2">
             <button
               onClick={handleCopyMarkdown}
-              className="flex items-center gap-1.5 rounded-lg border border-slate-800 bg-slate-900 px-3 py-1.5 text-xs text-slate-300 hover:border-slate-700 hover:text-white transition-colors"
+              className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-legal-surface-elevated px-3 py-1.5 text-xs text-slate-300 hover:border-gold-primary/30 hover:text-white transition-colors"
             >
-              {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5 text-amber-400" />}
+              {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5 text-gold-primary" />}
               <span>{copied ? 'Copied MD' : 'Copy Text'}</span>
             </button>
             <button
               onClick={handlePrint}
-              className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-1.5 text-xs font-bold text-slate-950 hover:from-amber-400 transition-all shadow-md"
+              className="flex items-center gap-1.5 rounded-lg bg-gold-primary px-3.5 py-1.5 text-xs font-semibold text-[#070B14] hover:bg-gold-hover transition-colors shadow-sm"
             >
               <Printer className="h-3.5 w-3.5" />
               <span>Print / Save PDF</span>
             </button>
             <button
               onClick={onClose}
-              className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors ml-1"
+              className="rounded-lg p-1.5 text-slate-400 hover:bg-white/5 hover:text-white transition-colors ml-1"
             >
               <X className="h-5 w-5" />
             </button>
@@ -110,8 +115,8 @@ ${document.clauseRisks.map((c) => `### ${c.clauseName} (${c.riskLevel} RISK)
         </div>
 
         {/* Formatted Legal Memo Sheet Preview */}
-        <div className="flex-1 overflow-y-auto p-6 sm:p-8 bg-slate-950">
-          <div className="rounded-xl bg-[#FAF9F6] text-slate-900 p-8 sm:p-10 shadow-2xl border border-amber-900/10 space-y-6 font-serif">
+        <div className="flex-1 overflow-y-auto p-6 sm:p-8 bg-legal-canvas">
+          <div className="rounded-xl bg-[#FAF9F6] text-slate-900 p-8 sm:p-10 shadow-2xl border border-amber-900/15 space-y-6 font-serif">
             
             {/* Chamber Header */}
             <div className="border-b-2 border-slate-900 pb-4 text-center space-y-1">

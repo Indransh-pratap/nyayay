@@ -1,69 +1,62 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Send, 
-  Sparkles, 
   Scale, 
   FileText, 
   ShieldCheck, 
   BookOpen, 
   Copy, 
   Check, 
-  RefreshCw, 
   ExternalLink, 
-  AlertCircle, 
-  Layers, 
-  HelpCircle, 
-  ShieldAlert, 
+  AlertTriangle, 
   Loader2,
   Trash2,
-  ChevronDown,
   Download,
-  Info,
-  CornerDownRight
+  ArrowRight
 } from 'lucide-react';
-import { PRESET_PROMPTS, MOCK_CHAT_RESPONSES, generateDynamicLegalResponse } from '../../data/mockChatQA';
+import { MOCK_CHAT_RESPONSES, generateDynamicLegalResponse } from '../../data/mockChatQA';
+
+const CAPABILITY_CARDS = [
+  {
+    id: "cap-risk",
+    title: "Analyze Risky Clauses",
+    desc: "Scan for unilateral terms, excessive penalties, and void covenants",
+    query: "What clauses are risky?"
+  },
+  {
+    id: "cap-laws",
+    title: "Find Applicable Laws",
+    desc: "Map provisions to BNS 2023, Contract Act, and Arbitration Act",
+    query: "Which Indian laws apply?"
+  },
+  {
+    id: "cap-precedents",
+    title: "Find Supreme Court Precedents",
+    desc: "Retrieve binding ratio decidendi from landmark judgments",
+    query: "Find relevant Supreme Court cases"
+  },
+  {
+    id: "cap-explain",
+    title: "Explain a Clause",
+    desc: "Break down legal terms into clear, plain language",
+    query: "Explain this clause simply"
+  }
+];
+
+const SUGGESTED_QUESTIONS = [
+  "What clauses are risky?",
+  "Which Indian laws apply?",
+  "Find relevant Supreme Court cases",
+  "Explain this clause simply"
+];
 
 export function LegalChatbot({ 
   activeDoc, 
   onOpenCitation, 
-  onOpenDisclaimer,
+  onOpenDisclaimer, 
   onExportMemo 
 }) {
-  const [messages, setMessages] = useState([
-    {
-      id: "welcome-msg",
-      sender: "ai",
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      confidence: 99.4,
-      grounding: "Grounding initialized against Indian Bare Acts (BNS, ICA, ACA, DPDP) & Supreme Court Law Reports",
-      text: `### ⚖️ Namaste & Welcome to NyayaAI Legal Assistant
-
-I am your specialized **Indian Legal AI Research & Contract Intelligence Assistant**. I am currently indexed on **${activeDoc ? activeDoc.title : "Indian Jurisprudence"}** (${activeDoc ? activeDoc.governingLaw : "Central Bare Acts"}).
-
-#### How I Can Assist You:
-* **Statutory Compliance**: Verify clauses against the *Indian Contract Act 1872*, *Arbitration & Conciliation Act 1996*, and *Bharatiya Nyaya Sanhita 2023*.
-* **Precedent Retrieval**: Ground queries in binding Supreme Court of India precedents (*Perkins Eastman*, *Vidya Drolia*, *Satender Kumar Antil*).
-* **Clause Risk Analysis**: Identify one-sided indemnities, void non-competes (Sec. 27 ICA), or punitive penalties.
-
-*Select one of the suggested legal prompts below or type your custom query:*`,
-      citations: [
-        {
-          type: "Statute",
-          title: "Indian Contract Act, 1872",
-          court: "Central Bare Act",
-          text: "Core legislation governing contract validity, consent, consideration, damages, and void agreements."
-        },
-        {
-          type: "Statute",
-          title: "Arbitration & Conciliation Act, 1996",
-          court: "Central Bare Act",
-          text: "Statutory framework governing domestic and international commercial arbitrations in India."
-        }
-      ],
-      relatedSections: ["ICA 1872", "ACA 1996", "BNS 2023", "DPDP 2023"]
-    }
-  ]);
-
+  const [messages, setMessages] = useState([]);
   const [inputQuery, setInputQuery] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
@@ -92,9 +85,8 @@ I am your specialized **Indian Legal AI Research & Contract Intelligence Assista
     setInputQuery('');
     setIsTyping(true);
 
-    // Simulate AI reasoning and streaming delay
+    // Simulate AI legal retrieval and statutory synthesis
     setTimeout(() => {
-      // Find preset response or dynamically generate
       let responseData = MOCK_CHAT_RESPONSES[textToSend];
       if (!responseData) {
         responseData = generateDynamicLegalResponse(textToSend, activeDoc);
@@ -104,8 +96,8 @@ I am your specialized **Indian Legal AI Research & Contract Intelligence Assista
         id: `ai-${Date.now()}`,
         sender: "ai",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        confidence: responseData.confidence || 98.4,
-        grounding: responseData.grounding || "Evidence Grounded in Indian Law",
+        confidence: responseData.confidence || 98.6,
+        grounding: responseData.grounding || "Evidence grounded in Indian statutes & law reports",
         text: responseData.answer,
         citations: responseData.citations || [],
         relatedSections: responseData.relatedSections || []
@@ -113,7 +105,7 @@ I am your specialized **Indian Legal AI Research & Contract Intelligence Assista
 
       setIsTyping(false);
       setMessages((prev) => [...prev, aiMsg]);
-    }, 1100);
+    }, 900);
   };
 
   const handleCopy = (text, id) => {
@@ -123,271 +115,303 @@ I am your specialized **Indian Legal AI Research & Contract Intelligence Assista
   };
 
   const handleClearChat = () => {
-    setMessages([
-      {
-        id: `reset-${Date.now()}`,
-        sender: "ai",
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        confidence: 99.4,
-        grounding: "Chat history cleared. Active context: " + (activeDoc?.title || "Indian Legal Corpus"),
-        text: `### 🔄 Chat Workspace Reset\n\nAsk any question regarding **${activeDoc ? activeDoc.title : "Indian Law"}**, statutory provisions, or clause validity.`,
-        citations: [],
-        relatedSections: ["ICA 1872", "ACA 1996"]
-      }
-    ]);
+    setMessages([]);
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-8.5rem)] rounded-2xl border border-slate-800 bg-slate-900/60 shadow-xl overflow-hidden animate-fade-in">
-      
-      {/* Top Chat Header */}
-      <div className="flex flex-wrap items-center justify-between border-b border-slate-800 bg-slate-950/80 px-6 py-3.5 gap-3">
-        <div className="flex items-center gap-3">
-          <div className="rounded-xl bg-amber-500/15 p-2 text-amber-400 border border-amber-500/30">
-            <Scale className="h-5 w-5" />
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 h-full flex flex-col">
+      <div className="flex flex-col flex-1 h-[calc(100vh-8.5rem)] rounded-xl border border-white/10 bg-legal-canvas shadow-sm overflow-hidden animate-fade-in">
+        
+        {/* Top Chat Header - Clean & Simple */}
+      <div className="flex items-center justify-between border-b border-white/10 bg-legal-surface px-6 py-4">
+        <div>
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-lg font-serif font-bold text-white tracking-tight">
+              NyayaAI Legal Assistant
+            </h1>
+            <span className="text-emerald-400 text-xs font-medium bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+              Grounded in Indian Law
+            </span>
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-sm font-serif font-bold text-white">
-                NyayaAI Legal Research Assistant
-              </h2>
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-500/20">
-                <ShieldCheck className="h-3 w-3" />
-                Evidence-Grounded in Indian Law
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-400">
-              Active Context: <span className="text-slate-300 font-medium">{activeDoc?.title || "General Indian Legal Corpus"}</span>
-            </p>
-          </div>
+          <p className="text-xs text-slate-400 mt-0.5">
+            Active document: <span className="text-slate-200 font-medium">{activeDoc?.title || "Master Services Agreement"}</span>
+          </p>
         </div>
 
         <div className="flex items-center gap-2">
+          {messages.length > 0 && (
+            <button
+              onClick={handleClearChat}
+              title="Clear conversation"
+              className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-legal-surface-elevated px-3 py-1.5 text-xs text-slate-400 hover:text-white hover:border-white/20 transition-colors"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              <span>Clear</span>
+            </button>
+          )}
           <button
             onClick={onExportMemo}
             title="Export conversation as Legal Brief"
-            className="flex items-center gap-1.5 rounded-lg border border-slate-800 bg-slate-900 px-3 py-1.5 text-xs text-slate-300 hover:border-slate-700 hover:text-white transition-colors"
+            className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-legal-surface-elevated px-3 py-1.5 text-xs text-slate-300 hover:text-white hover:border-white/20 transition-colors"
           >
-            <Download className="h-3.5 w-3.5 text-amber-400" />
-            <span className="hidden sm:inline">Export Brief</span>
-          </button>
-          <button
-            onClick={handleClearChat}
-            title="Clear Chat History"
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-rose-400 transition-colors"
-          >
-            <Trash2 className="h-4 w-4" />
+            <Download className="h-3.5 w-3.5 text-gold-primary" />
+            <span>Export Brief</span>
           </button>
         </div>
       </div>
 
-      {/* Suggested Prompt Quick-Chips Bar */}
-      <div className="border-b border-slate-800/80 bg-slate-950/50 px-4 py-2.5 overflow-x-auto scrollbar-none flex items-center gap-2">
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 whitespace-nowrap flex items-center gap-1">
-          <Sparkles className="h-3 w-3 text-amber-400" />
-          Example Prompts:
-        </span>
-        {PRESET_PROMPTS.map((prompt) => (
-          <button
-            key={prompt.id}
-            onClick={() => handleSendMessage(prompt.query)}
-            disabled={isTyping}
-            className="flex items-center gap-1.5 rounded-full border border-slate-800 bg-slate-900/90 px-3 py-1 text-xs text-slate-300 hover:border-amber-500/50 hover:bg-amber-500/10 hover:text-amber-300 transition-all whitespace-nowrap disabled:opacity-50"
-          >
-            <span>{prompt.label}</span>
-          </button>
-        ))}
-      </div>
-
-      {/* Messages Scroll Area */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-        
-        {messages.map((msg) => {
-          const isAi = msg.sender === 'ai';
-          return (
-            <div 
-              key={msg.id}
-              className={`flex gap-3 sm:gap-4 ${isAi ? 'items-start' : 'items-start flex-row-reverse'}`}
-            >
-              {/* Avatar */}
-              <div className={`flex h-8 w-8 sm:h-9 sm:w-9 flex-shrink-0 items-center justify-center rounded-xl border ${
-                isAi 
-                  ? 'bg-gradient-to-br from-amber-500/20 to-amber-600/10 border-amber-500/30 text-amber-400' 
-                  : 'bg-slate-800 border-slate-700 text-slate-200'
-              }`}>
-                {isAi ? <Scale className="h-4 w-4" /> : <div className="text-xs font-bold font-serif">Adv</div>}
+      {/* Messages Scroll Area - Centered Reading Column (Max 800px) */}
+      <div className="flex-1 overflow-y-auto px-4 py-8 sm:px-6">
+        <div className="max-w-[800px] mx-auto space-y-8">
+          
+          {/* Welcome State when no messages yet */}
+          {messages.length === 0 && (
+            <div className="space-y-8 py-4 animate-fade-in">
+              
+              {/* Simple Human Greeting */}
+              <div className="space-y-3 text-center sm:text-left">
+                <h2 className="text-2xl font-serif font-bold text-white">
+                  How can I help with this document?
+                </h2>
+                <p className="text-[15px] text-slate-300 leading-relaxed max-w-2xl">
+                  Ask questions about your document and get clear answers grounded in Indian law and Supreme Court precedents.
+                </p>
+                <div className="pt-1 text-[13px] text-slate-400">
+                  <span className="font-medium text-slate-300">Grounded in: </span>
+                  Indian Contract Act, 1872 · Arbitration & Conciliation Act, 1996 · Bharatiya Nyaya Sanhita, 2023
+                </div>
               </div>
 
-              {/* Message Bubble */}
-              <div className={`space-y-3 max-w-[90%] sm:max-w-[85%] ${
-                isAi ? 'flex-1' : ''
-              }`}>
-                
-                {/* AI Grounding Header Tag */}
-                {isAi && msg.grounding && (
-                  <div className="flex flex-wrap items-center gap-2 text-[11px]">
-                    <span className="flex items-center gap-1 text-emerald-400 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
-                      <ShieldCheck className="h-3 w-3" />
-                      {msg.confidence}% Evidence Grounded
-                    </span>
-                    <span className="text-slate-400 font-mono text-[10px] truncate max-w-md">
-                      {msg.grounding}
-                    </span>
-                  </div>
-                )}
+              {/* 4 Simple Capability Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                {CAPABILITY_CARDS.map((cap) => (
+                  <button
+                    key={cap.id}
+                    onClick={() => handleSendMessage(cap.query)}
+                    className="text-left p-4 rounded-xl border border-white/10 bg-legal-surface hover:bg-legal-surface-elevated hover:border-gold-primary/40 transition-all group"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-serif font-semibold text-slate-100 text-[15px] group-hover:text-gold-primary transition-colors">
+                        {cap.title}
+                      </span>
+                      <ArrowRight className="h-4 w-4 text-slate-500 group-hover:text-gold-primary group-hover:translate-x-0.5 transition-all" />
+                    </div>
+                    <p className="text-[13px] text-slate-400 mt-1 leading-normal">
+                      {cap.desc}
+                    </p>
+                  </button>
+                ))}
+              </div>
 
-                {/* Body Content */}
-                <div className={`rounded-2xl p-4 sm:p-5 text-xs sm:text-sm leading-relaxed shadow-md ${
-                  isAi
-                    ? 'border border-slate-800 bg-slate-950/70 text-slate-200 prose-invert'
-                    : 'bg-gradient-to-r from-amber-600 to-amber-500 text-slate-950 font-medium shadow-amber-500/10'
+              {/* Suggested Questions Section */}
+              <div className="space-y-3 pt-2">
+                <div className="text-[13px] font-medium uppercase tracking-wider text-slate-400">
+                  Suggested questions
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {SUGGESTED_QUESTIONS.map((q, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleSendMessage(q)}
+                      className="text-left px-4 py-3 rounded-lg border border-white/10 bg-legal-surface text-[14px] text-slate-300 hover:text-white hover:border-white/20 hover:bg-legal-surface-elevated transition-colors flex items-center justify-between"
+                    >
+                      <span>• {q}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          )}
+
+          {/* Conversation Messages */}
+          {messages.map((msg) => {
+            const isAi = msg.sender === 'ai';
+            return (
+              <div 
+                key={msg.id}
+                className={`flex gap-4 ${isAi ? 'items-start' : 'items-start flex-row-reverse'}`}
+              >
+                {/* Avatar */}
+                <div className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border ${
+                  isAi 
+                    ? 'bg-legal-surface border-gold-primary/40 text-gold-primary' 
+                    : 'bg-legal-surface-elevated border-white/10 text-slate-200'
                 }`}>
-                  <div className="whitespace-pre-wrap font-sans space-y-2">
-                    {msg.text.split('\n\n').map((para, i) => {
-                      if (para.startsWith('### ')) {
-                        return <h3 key={i} className="text-base font-serif font-bold text-amber-300 mt-2 mb-1">{para.replace('### ', '')}</h3>;
-                      }
-                      if (para.startsWith('#### ')) {
-                        return <h4 key={i} className="text-sm font-serif font-bold text-white mt-2 mb-1">{para.replace('#### ', '')}</h4>;
-                      }
-                      if (para.startsWith('> ')) {
-                        return (
-                          <div key={i} className="p-3 rounded-xl bg-amber-500/10 border-l-4 border-amber-500 text-amber-200 text-xs italic my-2">
-                            {para.replace('> ', '')}
-                          </div>
-                        );
-                      }
-                      return <p key={i} className="leading-relaxed">{para}</p>;
-                    })}
-                  </div>
+                  {isAi ? <Scale className="h-5 w-5" /> : <div className="text-xs font-mono font-bold">YOU</div>}
                 </div>
 
-                {/* Citations & Precedent Cards (For AI Responses) */}
-                {isAi && msg.citations && msg.citations.length > 0 && (
-                  <div className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-3.5 space-y-2.5">
-                    <div className="flex items-center justify-between text-[11px] text-slate-400">
-                      <span className="font-semibold text-amber-300 flex items-center gap-1.5">
-                        <BookOpen className="h-3.5 w-3.5 text-amber-400" />
-                        Supporting Statutory & Case Precedents ({msg.citations.length})
+                {/* Message Bubble Container */}
+                <div className={`space-y-3 flex-1 min-w-0 ${
+                  !isAi ? 'max-w-[85%]' : ''
+                }`}>
+                  
+                  {/* AI Metadata header */}
+                  {isAi && (
+                    <div className="flex items-center gap-2 text-xs text-slate-400">
+                      <span className="text-emerald-400 font-medium">
+                        Evidence grounded · {msg.confidence}%
                       </span>
-                      <span className="text-[10px] font-mono text-emerald-400">Verified Supreme Court / Central Acts</span>
+                      <span>·</span>
+                      <span>Indian statutes & precedents</span>
                     </div>
+                  )}
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {msg.citations.map((cite, cIdx) => (
-                        <div 
-                          key={cIdx} 
-                          className="rounded-lg border border-slate-800 bg-slate-900/80 p-2.5 text-xs space-y-1 hover:border-amber-500/40 transition-colors"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="font-serif font-bold text-slate-200 truncate text-[11px]">
-                              {cite.title}
-                            </span>
-                            <span className="rounded bg-slate-800 px-1.5 py-0.2 text-[9px] font-mono text-amber-400 border border-slate-700">
-                              {cite.type}
-                            </span>
-                          </div>
-                          {cite.citation && (
-                            <div className="text-[10px] font-mono text-slate-400">{cite.citation}</div>
-                          )}
-                          <p className="text-[11px] text-slate-400 line-clamp-2 leading-tight">
-                            "{cite.text}"
-                          </p>
-                          <button
-                            onClick={() => onOpenCitation(cite.title)}
-                            className="text-[10px] text-amber-400 hover:text-amber-300 flex items-center gap-1 pt-1 font-medium"
-                          >
-                            <span>Inspect Full Text</span>
-                            <ExternalLink className="h-2.5 w-2.5" />
-                          </button>
-                        </div>
-                      ))}
+                  {/* Body Content with 16px font and 1.7 line height */}
+                  <div className={`rounded-xl p-6 text-[16px] leading-[1.7] ${
+                    isAi
+                      ? 'border border-white/10 bg-legal-surface text-slate-200 shadow-sm'
+                      : 'bg-legal-surface-elevated border border-gold-primary/30 text-white font-medium shadow-sm ml-auto'
+                  }`}>
+                    <div className="whitespace-pre-wrap font-sans space-y-3">
+                      {msg.text.split('\n\n').map((para, i) => {
+                        if (para.startsWith('### ')) {
+                          return (
+                            <h3 key={i} className="text-xl font-serif font-bold text-white pt-2 pb-1 border-b border-white/10">
+                              {para.replace('### ', '')}
+                            </h3>
+                          );
+                        }
+                        if (para.startsWith('#### ')) {
+                          return (
+                            <h4 key={i} className="text-[16px] font-serif font-semibold text-gold-primary pt-2 pb-0.5">
+                              {para.replace('#### ', '')}
+                            </h4>
+                          );
+                        }
+                        if (para.startsWith('> ')) {
+                          return (
+                            <div key={i} className="p-4 rounded-lg bg-legal-canvas border-l-2 border-gold-primary text-slate-300 text-[15px] my-3 leading-relaxed">
+                              {para.replace('> ', '')}
+                            </div>
+                          );
+                        }
+                        return <p key={i} className="text-slate-300 leading-[1.7]">{para}</p>;
+                      })}
                     </div>
                   </div>
-                )}
 
-                {/* Action Bar (Copy / Feedback / Timestamp) */}
-                {isAi && (
-                  <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1 px-1">
-                    <span>Generated at {msg.timestamp}</span>
-                    <div className="flex items-center gap-2">
+                  {/* Sources Used Section (Clean cards with View source ->) */}
+                  {isAi && msg.citations && msg.citations.length > 0 && (
+                    <div className="pt-2 space-y-2.5">
+                      <div className="text-[13px] font-semibold text-slate-400 uppercase tracking-wide">
+                        Sources used
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {msg.citations.map((cite, cIdx) => (
+                          <div 
+                            key={cIdx} 
+                            className="rounded-xl border border-white/10 bg-legal-surface p-4 text-[14px] space-y-1.5 hover:border-white/20 transition-colors"
+                          >
+                            <div className="font-serif font-bold text-slate-100">
+                              {cite.title}
+                            </div>
+                            {cite.citation && (
+                              <div className="text-xs text-slate-400 font-mono">{cite.citation}</div>
+                            )}
+                            <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
+                              {cite.text}
+                            </p>
+                            <button
+                              onClick={() => onOpenCitation && onOpenCitation(cite.title)}
+                              className="text-[13px] text-gold-primary hover:text-gold-hover flex items-center gap-1.5 pt-1 font-medium transition-colors"
+                            >
+                              <span>View source</span>
+                              <ArrowRight className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Message Action Bar */}
+                  {isAi && (
+                    <div className="flex items-center justify-between text-xs text-slate-500 pt-1 px-1">
+                      <span>{msg.timestamp}</span>
                       <button
                         onClick={() => handleCopy(msg.text, msg.id)}
-                        className="flex items-center gap-1 text-slate-400 hover:text-slate-200 transition-colors"
+                        className="flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors"
                       >
-                        {copiedId === msg.id ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
-                        <span>{copiedId === msg.id ? 'Copied' : 'Copy Legal Memo'}</span>
+                        {copiedId === msg.id ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+                        <span>{copiedId === msg.id ? 'Copied' : 'Copy response'}</span>
                       </button>
                     </div>
-                  </div>
-                )}
+                  )}
 
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Typing Indicator */}
+          {isTyping && (
+            <div className="flex gap-4 items-start animate-fade-in">
+              <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-gold-primary/40 bg-legal-surface text-gold-primary">
+                <Scale className="h-5 w-5 animate-pulse" />
+              </div>
+              <div className="rounded-xl border border-white/10 bg-legal-surface p-5 space-y-1.5 max-w-md">
+                <div className="flex items-center gap-2 text-[14px] font-medium text-slate-200">
+                  <Loader2 className="h-4 w-4 animate-spin text-gold-primary" />
+                  <span>Reviewing statutes and precedent records...</span>
+                </div>
+                <p className="text-xs text-slate-400 leading-normal">
+                  Verifying provisions against the Indian Contract Act and Supreme Court ratios.
+                </p>
               </div>
             </div>
-          );
-        })}
+          )}
 
-        {/* Typing Loading Indicator */}
-        {isTyping && (
-          <div className="flex gap-3 items-start animate-fade-in">
-            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-400">
-              <Scale className="h-4 w-4 animate-pulse" />
-            </div>
-            <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4 space-y-2 max-w-md">
-              <div className="flex items-center gap-2 text-xs font-serif text-amber-300">
-                <Loader2 className="h-3.5 w-3.5 animate-spin text-amber-400" />
-                <span>Grounding in Bare Acts & Supreme Court Precedents...</span>
-              </div>
-              <p className="text-[11px] text-slate-400">
-                Synthesizing statutory sections, calculating evidence grounding score, and formulating counsel guidance.
-              </p>
-            </div>
-          </div>
-        )}
-
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Input Composer */}
-      <div className="border-t border-slate-800 bg-slate-950/90 p-4 space-y-2">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSendMessage();
-          }}
-          className="flex items-center gap-2"
-        >
-          <div className="relative flex-1">
-            <input
-              type="text"
-              value={inputQuery}
-              onChange={(e) => setInputQuery(e.target.value)}
-              placeholder={`Ask any question about ${activeDoc ? activeDoc.title : "Indian law"}...`}
-              disabled={isTyping}
-              className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-4 py-3 text-xs sm:text-sm text-white placeholder-slate-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 disabled:opacity-50 transition-all"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={!inputQuery.trim() || isTyping}
-            className="flex items-center justify-center h-11 w-11 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold hover:from-amber-400 hover:to-amber-500 transition-all shadow-md shadow-amber-500/20 disabled:opacity-40 active:scale-95 flex-shrink-0"
-          >
-            {isTyping ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-          </button>
-        </form>
-
-        <div className="flex items-center justify-between text-[10px] text-slate-400 px-1">
-          <span>AI generated responses are grounded in verified Indian statutes and law reports.</span>
-          <button
-            onClick={onOpenDisclaimer}
-            className="text-amber-400/80 hover:text-amber-300 underline"
-          >
-            Advocates Act Notice
-          </button>
+          <div ref={messagesEndRef} />
         </div>
       </div>
 
+      {/* Sticky Bottom Chat Input - 54-58px height, 16px font */}
+      <div className="border-t border-white/10 bg-legal-surface p-4 sm:px-6">
+        <div className="max-w-[800px] mx-auto space-y-2">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSendMessage();
+            }}
+            className="flex items-center gap-3"
+          >
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={inputQuery}
+                onChange={(e) => setInputQuery(e.target.value)}
+                placeholder="Ask a question about this document..."
+                disabled={isTyping}
+                className="w-full h-14 rounded-xl border border-white/10 bg-legal-canvas px-5 text-[16px] text-white placeholder-slate-500 focus:border-gold-primary/70 focus:outline-none focus:ring-1 focus:ring-gold-primary/40 disabled:opacity-50 transition-all shadow-inner"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={!inputQuery.trim() || isTyping}
+              className="flex items-center justify-center h-14 w-14 rounded-xl bg-gold-primary text-[#070B14] font-bold hover:bg-gold-hover transition-all shadow-sm disabled:opacity-30 active:scale-95 flex-shrink-0"
+              aria-label="Send question"
+            >
+              {isTyping ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+            </button>
+          </form>
+
+          <div className="flex items-center justify-between text-xs text-slate-400 px-1">
+            <span>Answers are grounded in Indian law.</span>
+            <button
+              onClick={onOpenDisclaimer}
+              className="hover:text-gold-primary transition-colors underline"
+            >
+              Advocates Act notice
+            </button>
+          </div>
+        </div>
+      </div>
+      </div>
     </div>
   );
 }
+
+export default LegalChatbot;

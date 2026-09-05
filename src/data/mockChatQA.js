@@ -5,43 +5,56 @@
 
 export const PRESET_PROMPTS = [
   {
+    id: "p-risk",
+    label: "Identify risky clauses in this agreement",
+    query: "Identify risky clauses in this agreement",
+    icon: "AlertTriangle",
+    desc: "Scan for unilateral arbitration, penalty fees, and void covenants"
+  },
+  {
+    id: "p-statutes",
+    label: "Which sections of Indian law apply?",
+    query: "Which sections of Indian law apply?",
+    icon: "Scale",
+    desc: "Map provisions to BNS 2023, ICA 1872, ACA 1996, and DPDP 2023"
+  },
+  {
+    id: "p-precedents",
+    label: "Find relevant Supreme Court precedents",
+    query: "Find relevant Supreme Court precedents",
+    icon: "BookOpen",
+    desc: "Retrieve binding ratio decidendi from Supreme Court reports"
+  },
+  {
+    id: "p-explain",
+    label: "Explain this clause in simple language",
+    query: "Explain this clause in simple language",
+    icon: "FileText",
+    desc: "Plain language breakdown of rights, risks & remedies"
+  },
+  {
     id: "p1",
-    label: "Summarize in simple terms",
+    label: "Summarize this document in simple terms",
     query: "Summarize this document in simple terms",
     icon: "FileText",
     desc: "Plain language executive breakdown of rights, duties & risks"
   },
   {
-    id: "p2",
-    label: "Most important sections",
-    query: "What are the most important sections?",
-    icon: "Layers",
-    desc: "Key statutory and contractual provisions flagged"
-  },
-  {
-    id: "p3",
-    label: "Rights provided by law",
-    query: "What rights does this law provide?",
-    icon: "ShieldAlert",
-    desc: "Legal protections, statutory remedies, and entitlements"
-  },
-  {
     id: "p4",
-    label: "Application to minors",
+    label: "Does this provision apply to minors?",
     query: "Does this provision apply to minors?",
     icon: "HelpCircle",
     desc: "Enforceability under Section 11 ICA and DPDP Act § 9"
-  },
-  {
-    id: "p5",
-    label: "Supporting legal sources",
-    query: "Show me the legal sources supporting this answer",
-    icon: "BookOpen",
-    desc: "Bare Acts, Supreme Court citations & statutory grounding"
   }
 ];
 
 export const MOCK_CHAT_RESPONSES = {
+  // Aliases for simplified prompts
+  "What clauses are risky?": null, // will be linked below or defined
+  "Which Indian laws apply?": null,
+  "Find relevant Supreme Court cases": null,
+  "Explain this clause simply": null,
+
   // 1. Plain language summary
   "Summarize this document in simple terms": {
     confidence: 98.4,
@@ -277,9 +290,11 @@ The analysis and risk evaluations provided for this document are grounded in the
   }
 };
 
-/**
- * Fallback AI response generator for dynamic user queries
- */
+// Aliases for simplified prompts
+MOCK_CHAT_RESPONSES["What clauses are risky?"] = MOCK_CHAT_RESPONSES["Identify risky clauses in this agreement"];
+MOCK_CHAT_RESPONSES["Which Indian laws apply?"] = MOCK_CHAT_RESPONSES["Which sections of Indian law apply?"];
+MOCK_CHAT_RESPONSES["Find relevant Supreme Court cases"] = MOCK_CHAT_RESPONSES["Find relevant Supreme Court precedents"];
+MOCK_CHAT_RESPONSES["Explain this clause simply"] = MOCK_CHAT_RESPONSES["Explain this clause in simple language"];
 export function generateDynamicLegalResponse(query, document) {
   const q = query.toLowerCase();
 

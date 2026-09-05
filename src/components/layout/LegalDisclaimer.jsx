@@ -5,17 +5,17 @@ export function LegalDisclaimerModal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-2xl rounded-2xl border border-amber-500/30 bg-slate-900 p-6 shadow-2xl space-y-5">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
+      <div className="relative w-full max-w-2xl rounded-xl border border-gold-primary/25 bg-legal-surface p-6 shadow-2xl space-y-5">
         
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-slate-800 pb-4">
+        <div className="flex items-start justify-between border-b border-white/10 pb-4">
           <div className="flex items-center gap-3">
-            <div className="rounded-xl bg-amber-500/15 p-2.5 text-amber-400 border border-amber-500/30">
+            <div className="rounded-lg bg-gold-primary/10 p-2.5 text-gold-primary border border-gold-primary/25">
               <Scale className="h-6 w-6" />
             </div>
             <div>
-              <h2 className="text-lg font-serif font-bold text-white flex items-center gap-2">
+              <h2 className="text-base font-serif font-bold text-white flex items-center gap-2">
                 Legal Information & Compliance Disclaimer
               </h2>
               <p className="text-xs text-slate-400">
@@ -25,7 +25,7 @@ export function LegalDisclaimerModal({ isOpen, onClose }) {
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+            className="rounded-lg p-1.5 text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
@@ -33,12 +33,12 @@ export function LegalDisclaimerModal({ isOpen, onClose }) {
 
         {/* Content */}
         <div className="space-y-4 text-xs text-slate-300 leading-relaxed max-h-[60vh] overflow-y-auto pr-2">
-          <div className="rounded-xl bg-amber-500/10 border border-amber-500/20 p-3.5 text-amber-200">
-            <div className="flex items-center gap-2 font-semibold text-amber-300 mb-1">
+          <div className="rounded-lg bg-gold-primary/5 border border-gold-primary/20 p-3.5 text-amber-200">
+            <div className="flex items-center gap-2 font-semibold text-gold-primary mb-1">
               <AlertTriangle className="h-4 w-4" />
               <span>Not a Substitute for Qualified Legal Counsel</span>
             </div>
-            <p className="text-[11px] text-amber-200/90 leading-relaxed">
+            <p className="text-[11px] text-slate-300 leading-relaxed">
               NyayaAI is an advanced legal intelligence and document analysis system engineered to augment advocates, legal counsels, corporate compliance teams, and legal scholars in statutory research and clause risk analysis.
             </p>
           </div>
@@ -71,13 +71,13 @@ export function LegalDisclaimerModal({ isOpen, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between border-t border-slate-800 pt-4">
+        <div className="flex items-center justify-between border-t border-white/10 pt-4">
           <span className="text-[11px] text-slate-400">
             Regulated under Indian Jurisprudence Standards
           </span>
           <button
             onClick={onClose}
-            className="rounded-lg bg-amber-500 px-5 py-2 text-xs font-semibold text-slate-950 hover:bg-amber-400 transition-colors shadow-md shadow-amber-500/20"
+            className="rounded-lg bg-gold-primary px-4 py-2 text-xs font-semibold text-[#070B14] hover:bg-gold-hover transition-colors shadow-sm"
           >
             I Acknowledge & Understand
           </button>

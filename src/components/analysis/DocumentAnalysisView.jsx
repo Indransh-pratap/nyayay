@@ -13,24 +13,32 @@ import {
   Layers, 
   Users, 
   Eye, 
-  CornerDownRight, 
   Check, 
   MessageSquareText,
   Clock,
   MapPin,
-  IndianRupee,
   Calendar,
   Building,
-  Info
+  Info,
+  ChevronRight,
+  ShieldCheck
 } from 'lucide-react';
 
 export function DocumentAnalysisView({ 
   document, 
+  activeSubTab: controlledSubTab,
+  setActiveSubTab: setControlledSubTab,
   onNavigateToChat, 
   onOpenCitation, 
   onExportMemo 
 }) {
-  const [activeSubTab, setActiveSubTab] = useState('summary');
+  const [localSubTab, setLocalSubTab] = useState('summary');
+  const activeSubTab = controlledSubTab !== undefined ? controlledSubTab : localSubTab;
+  const setActiveSubTab = (tab) => {
+    if (setControlledSubTab) setControlledSubTab(tab);
+    setLocalSubTab(tab);
+  };
+
   const [copiedId, setCopiedId] = useState(null);
   const [selectedClauseId, setSelectedClauseId] = useState(document?.clauseRisks?.[0]?.id || null);
 
@@ -38,9 +46,9 @@ export function DocumentAnalysisView({
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
         <FileText className="h-12 w-12 text-slate-600" />
-        <h3 className="text-lg font-serif font-semibold text-slate-300">No Document Selected</h3>
+        <h3 className="text-lg font-serif font-semibold text-slate-300">No Legal Document Selected</h3>
         <p className="text-xs text-slate-500 max-w-sm">
-          Please select a sample legal document or upload a new file from the dashboard to view analysis.
+          Please select a sample legal document or upload a new file from the workspace dashboard to view statutory analysis.
         </p>
       </div>
     );
@@ -53,61 +61,56 @@ export function DocumentAnalysisView({
   };
 
   const tabs = [
-    { id: 'summary', label: 'Executive Summary', icon: FileText, count: null },
-    { id: 'sections', label: 'Key Statutory Sections', icon: Scale, count: document.keySections?.length },
-    { id: 'risks', label: 'Clause Risk & Redlines', icon: AlertTriangle, count: document.clauseRisks?.length, alert: true },
-    { id: 'entities', label: 'Parties & Legal Entities', icon: Users, count: document.entities?.length },
-    { id: 'split', label: 'Interactive Document Viewer', icon: Eye, count: 'Sync' }
+    { id: 'summary', label: 'Executive Summary', icon: FileText },
+    { id: 'sections', label: 'Key Sections', icon: Scale, count: document.keySections?.length },
+    { id: 'risks', label: 'Clause Risks & Redlines', icon: AlertTriangle, count: document.clauseRisks?.length },
+    { id: 'entities', label: 'Parties & Entities', icon: Users },
+    { id: 'split', label: 'Transcript Viewer', icon: Eye }
   ];
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fade-in">
       
       {/* Master Document Header */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-xl space-y-5">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="rounded-xl border border-white/10 bg-legal-surface p-6 sm:p-8 space-y-6">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           
-          <div className="space-y-1.5 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded bg-amber-500/15 px-2.5 py-0.5 text-xs font-semibold text-amber-300 border border-amber-500/30">
-                {document.documentType}
-              </span>
-              <span className="rounded bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                {document.groundingConfidence}% Statutory Grounding
-              </span>
-              <span className="rounded bg-rose-500/10 px-2.5 py-0.5 text-xs font-semibold text-rose-300 border border-rose-500/20">
-                {document.riskScore}
-              </span>
+          <div className="space-y-2 flex-1">
+            <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-gold-primary">
+              <span>{document.documentType}</span>
+              <span>·</span>
+              <span className="text-emerald-400 font-medium">{document.groundingConfidence}% grounded</span>
+              <span>·</span>
+              <span className="text-rose-400 font-medium">{document.riskScore}</span>
             </div>
             
-            <h1 className="text-xl sm:text-2xl font-serif font-bold text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-serif font-bold text-white tracking-tight">
               {document.title}
             </h1>
             
-            <p className="text-xs text-slate-400 flex flex-wrap items-center gap-x-4 gap-y-1">
-              <span>Jurisdiction: <strong className="text-slate-300">{document.jurisdiction}</strong></span>
-              <span>•</span>
-              <span>Governing Law: <strong className="text-slate-300">{document.governingLaw}</strong></span>
-              <span>•</span>
-              <span>Size: <strong className="text-slate-300">{document.fileSize} ({document.pages} pgs)</strong></span>
+            <p className="text-[14px] text-slate-400 flex flex-wrap items-center gap-x-4 gap-y-1 pt-1">
+              <span>Jurisdiction: <strong className="text-slate-200">{document.jurisdiction}</strong></span>
+              <span>·</span>
+              <span>Governing Law: <strong className="text-slate-200">{document.governingLaw}</strong></span>
+              <span>·</span>
+              <span>{document.pages} pages ({document.fileSize})</span>
             </p>
           </div>
 
           {/* Action CTAs */}
-          <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-3 flex-shrink-0">
             <button
               onClick={() => onNavigateToChat(document)}
-              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-2.5 text-xs font-bold text-slate-950 hover:from-amber-400 hover:to-amber-500 transition-all shadow-lg shadow-amber-500/20 active:scale-95"
+              className="flex items-center gap-2 rounded-lg bg-gold-primary px-4 py-2.5 text-[14px] font-semibold text-[#070B14] hover:bg-gold-hover transition-colors shadow-sm"
             >
-              <Sparkles className="h-4 w-4" />
-              <span>Ask AI About This Doc</span>
+              <Sparkles className="h-4 w-4 text-[#070B14]" />
+              <span>Ask AI About This File</span>
             </button>
             <button
               onClick={onExportMemo}
-              className="flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2.5 text-xs font-medium text-slate-200 hover:bg-slate-800 hover:text-white transition-all shadow-sm"
+              className="flex items-center gap-2 rounded-lg border border-white/10 bg-legal-surface-elevated px-4 py-2.5 text-[14px] font-medium text-slate-200 hover:border-white/20 hover:text-white transition-colors"
             >
-              <Download className="h-4 w-4 text-amber-400" />
+              <Download className="h-4 w-4 text-gold-primary" />
               <span>Export Legal Brief</span>
             </button>
           </div>
@@ -115,7 +118,7 @@ export function DocumentAnalysisView({
         </div>
 
         {/* Sub-Tab Navigation Bar */}
-        <div className="flex items-center gap-1 border-t border-slate-800 pt-4 overflow-x-auto pb-1 scrollbar-none">
+        <div className="flex items-center gap-2 border-t border-white/10 pt-4 overflow-x-auto pb-1 scrollbar-none">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeSubTab === tab.id;
@@ -123,23 +126,17 @@ export function DocumentAnalysisView({
               <button
                 key={tab.id}
                 onClick={() => setActiveSubTab(tab.id)}
-                className={`flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold whitespace-nowrap transition-all ${
+                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-[14px] font-medium whitespace-nowrap transition-colors ${
                   isActive
-                    ? 'bg-amber-500/15 border border-amber-500/40 text-amber-300 shadow-sm'
-                    : 'text-slate-400 hover:bg-slate-800/70 hover:text-slate-200 border border-transparent'
+                    ? 'bg-legal-surface-elevated text-gold-primary border border-gold-primary/30 font-semibold'
+                    : 'text-slate-400 hover:bg-legal-surface-elevated/50 hover:text-slate-200'
                 }`}
               >
-                <Icon className={`h-3.5 w-3.5 ${isActive ? 'text-amber-400' : 'text-slate-400'}`} />
+                <Icon className={`h-4 w-4 ${isActive ? 'text-gold-primary' : 'text-slate-500'}`} />
                 <span>{tab.label}</span>
-                {tab.count !== null && (
-                  <span className={`ml-1 rounded-full px-1.5 py-0.2 text-[10px] ${
-                    tab.alert 
-                      ? 'bg-rose-500/20 text-rose-300' 
-                      : isActive 
-                      ? 'bg-amber-400/20 text-amber-300' 
-                      : 'bg-slate-800 text-slate-400'
-                  }`}>
-                    {tab.count}
+                {tab.count !== undefined && tab.count !== null && (
+                  <span className="ml-1 text-xs font-mono text-slate-500">
+                    ({tab.count})
                   </span>
                 )}
               </button>
@@ -158,42 +155,47 @@ export function DocumentAnalysisView({
           <div className="lg:col-span-2 space-y-6">
             
             {/* Plain language summary box */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-base font-serif font-bold text-white flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-amber-400" />
-                  AI Executive Plain Language Summary
+            <div className="rounded-xl border border-white/10 bg-legal-surface p-6 sm:p-8 space-y-4 shadow-sm">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <h3 className="text-lg font-serif font-bold text-white flex items-center gap-2.5">
+                  <FileText className="h-5 w-5 text-gold-primary" />
+                  Executive Legal Summary
                 </h3>
-                <span className="rounded bg-slate-800 px-2 py-0.5 text-[10px] font-mono text-emerald-400 border border-slate-700">
-                  Plain-English Counsel Synthesis
+                <span className="text-xs text-emerald-400">
+                  Counsel Synthesis
                 </span>
               </div>
               
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              <p className="text-[15px] sm:text-[16px] text-slate-200 leading-[1.7]">
                 {document.summary.executiveSummary}
               </p>
 
-              <div className="rounded-xl bg-slate-950/80 border border-slate-800 p-4 space-y-2 text-xs">
-                <div className="text-slate-400 font-semibold uppercase tracking-wider text-[10px]">
+              <div className="rounded-lg bg-legal-canvas border border-white/5 p-4 space-y-1">
+                <div className="text-slate-500 font-mono font-semibold uppercase tracking-wider text-[11px]">
                   Procedural Posture / Stage
                 </div>
-                <div className="text-amber-300 font-medium font-serif text-sm">
+                <div className="text-slate-200 font-serif text-[15px] font-medium">
                   {document.summary.proceduralPosture}
                 </div>
               </div>
             </div>
 
             {/* Key Risk Findings */}
-            <div className="rounded-2xl border border-rose-500/30 bg-rose-950/10 p-6 space-y-4">
-              <h3 className="text-base font-serif font-bold text-rose-300 flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-rose-400" />
-                Critical Legal Vulnerabilities Identified
-              </h3>
+            <div className="rounded-xl border border-rose-500/20 bg-legal-surface p-6 sm:p-8 space-y-4 shadow-sm">
+              <div className="flex items-center justify-between border-b border-rose-500/20 pb-3">
+                <h3 className="text-lg font-serif font-bold text-rose-300 flex items-center gap-2.5">
+                  <AlertTriangle className="h-5 w-5 text-rose-400" />
+                  Critical Vulnerabilities ({document.summary.keyRiskFindings?.length || 0})
+                </h3>
+                <span className="text-xs text-rose-400">
+                  Requires Review
+                </span>
+              </div>
 
               <div className="space-y-3">
                 {document.summary.keyRiskFindings.map((finding, idx) => (
-                  <div key={idx} className="flex items-start gap-3 p-3 rounded-xl bg-slate-900/80 border border-rose-500/20 text-xs text-slate-300">
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-rose-500/20 text-rose-400 font-bold text-[10px] flex-shrink-0 mt-0.5">
+                  <div key={idx} className="flex items-start gap-3.5 p-4 rounded-lg bg-legal-canvas border border-white/5 text-[14px] text-slate-300">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-rose-500/10 text-rose-400 font-mono font-bold text-xs flex-shrink-0 mt-0.5 border border-rose-500/20">
                       {idx + 1}
                     </span>
                     <span className="leading-relaxed">{finding}</span>
@@ -208,15 +210,17 @@ export function DocumentAnalysisView({
           <div className="space-y-6">
             
             {/* Legal Recommendations */}
-            <div className="rounded-2xl border border-amber-500/30 bg-slate-900/60 p-6 space-y-4">
-              <h3 className="text-base font-serif font-bold text-white flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-amber-400" />
-                Actionable Counsel Guidance
-              </h3>
+            <div className="rounded-xl border border-white/10 bg-legal-surface p-6 space-y-4 shadow-sm">
+              <div className="flex items-center gap-2.5 border-b border-white/10 pb-3">
+                <Sparkles className="h-5 w-5 text-gold-primary" />
+                <h3 className="text-lg font-serif font-bold text-white">
+                  Counsel Recommendations
+                </h3>
+              </div>
 
               <div className="space-y-3">
                 {document.summary.legalRecommendations.map((rec, idx) => (
-                  <div key={idx} className="flex items-start gap-2.5 p-3 rounded-xl bg-slate-950/60 border border-amber-500/20 text-xs text-slate-300">
+                  <div key={idx} className="flex items-start gap-3 p-4 rounded-lg bg-legal-canvas border border-white/5 text-[14px] text-slate-300">
                     <CheckCircle2 className="h-4 w-4 text-emerald-400 flex-shrink-0 mt-0.5" />
                     <span className="leading-relaxed">{rec}</span>
                   </div>
@@ -225,7 +229,7 @@ export function DocumentAnalysisView({
 
               <button
                 onClick={() => onNavigateToChat(document)}
-                className="w-full mt-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 py-2.5 text-xs font-semibold text-amber-300 flex items-center justify-center gap-2 transition-colors"
+                className="w-full mt-2 rounded-lg bg-gold-primary/10 hover:bg-gold-primary/20 border border-gold-primary/30 py-2.5 text-[14px] font-semibold text-gold-primary flex items-center justify-center gap-2 transition-colors"
               >
                 <MessageSquareText className="h-4 w-4" />
                 <span>Interrogate Findings in AI Chat</span>
@@ -233,19 +237,19 @@ export function DocumentAnalysisView({
             </div>
 
             {/* Quick Parties Summary */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 space-y-3">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                <Building className="h-3.5 w-3.5 text-amber-400" />
-                Contracting Parties / Litigants
+            <div className="rounded-xl border border-white/10 bg-legal-surface p-6 space-y-4 shadow-sm">
+              <h4 className="text-[12px] font-mono font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2 border-b border-white/10 pb-3">
+                <Building className="h-4 w-4 text-gold-primary" />
+                Contracting Parties
               </h4>
-              <div className="space-y-2 text-xs">
-                <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-300">
-                  <div className="text-[10px] text-amber-400 font-medium">Party A</div>
-                  <div className="font-semibold">{document.parties.partyA}</div>
+              <div className="space-y-3 text-[14px]">
+                <div className="p-3 rounded-lg bg-legal-canvas border border-white/5 text-slate-300">
+                  <div className="text-xs text-slate-500 font-mono">Party A</div>
+                  <div className="font-semibold text-slate-200 mt-0.5">{document.parties.partyA}</div>
                 </div>
-                <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-300">
-                  <div className="text-[10px] text-amber-400 font-medium">Party B</div>
-                  <div className="font-semibold">{document.parties.partyB}</div>
+                <div className="p-3 rounded-lg bg-legal-canvas border border-white/5 text-slate-300">
+                  <div className="text-xs text-slate-500 font-mono">Party B</div>
+                  <div className="font-semibold text-slate-200 mt-0.5">{document.parties.partyB}</div>
                 </div>
               </div>
             </div>
@@ -257,65 +261,65 @@ export function DocumentAnalysisView({
 
       {/* 2. KEY STATUTORY SECTIONS TAB */}
       {activeSubTab === 'sections' && (
-        <div className="space-y-4 animate-fade-in">
-          <div className="flex items-center justify-between">
+        <div className="space-y-6 animate-fade-in">
+          <div className="flex items-center justify-between border-b border-white/10 pb-3">
             <div>
-              <h3 className="text-base font-serif font-bold text-white flex items-center gap-2">
-                <Scale className="h-4 w-4 text-amber-400" />
-                Statutory Cross-References & Section Analyses
+              <h3 className="text-xl font-serif font-bold text-white flex items-center gap-2.5">
+                <Scale className="h-5 w-5 text-gold-primary" />
+                Statutory Cross-References
               </h3>
-              <p className="text-xs text-slate-400">
-                Clauses mapped against relevant Central Acts, Bare Act Sections, and Supreme Court precedent doctrines
+              <p className="text-[14px] text-slate-400 mt-0.5">
+                Clauses mapped against Central Acts and Supreme Court precedent doctrines
               </p>
             </div>
-            <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+            <span className="text-[13px] text-emerald-400">
               {document.keySections?.length} Sections Evaluated
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {document.keySections.map((sec, idx) => (
               <div 
                 key={idx}
-                className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 space-y-3 hover:border-slate-700 transition-all flex flex-col justify-between"
+                className="rounded-xl border border-white/10 bg-legal-surface p-6 space-y-4 hover:border-white/20 transition-all flex flex-col justify-between"
               >
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">
+                    <span className="text-[13px] font-mono font-bold text-gold-primary">
                       {sec.sectionNumber}
                     </span>
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${
+                    <span className={`text-xs font-mono font-medium px-2 py-0.5 rounded ${
                       sec.status.includes('Critical') || sec.status.includes('Void')
-                        ? 'bg-rose-500/15 text-rose-300 border-rose-500/30'
-                        : 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+                        ? 'text-rose-400'
+                        : 'text-gold-primary'
                     }`}>
                       {sec.status}
                     </span>
                   </div>
 
-                  <h4 className="font-serif font-bold text-sm text-white">
+                  <h4 className="font-serif font-bold text-lg text-white">
                     {sec.title}
                   </h4>
 
-                  <div className="text-xs font-medium text-slate-400">
-                    Statute: <span className="text-slate-300 font-semibold">{sec.statute}</span>
+                  <div className="text-[13px] text-slate-400">
+                    Statute: <span className="text-slate-200 font-medium">{sec.statute}</span>
                   </div>
 
-                  <p className="text-xs text-slate-300 leading-relaxed pt-1">
+                  <p className="text-[14px] text-slate-300 leading-relaxed pt-1">
                     {sec.analysis}
                   </p>
                 </div>
 
-                <div className="pt-3 border-t border-slate-800/80 mt-3 flex items-center justify-between text-[11px]">
+                <div className="pt-3 border-t border-white/10 mt-3 flex items-center justify-between text-[13px]">
                   <span className="text-slate-400 font-mono truncate max-w-[240px]">
                     {sec.statutoryReference}
                   </span>
                   <button
                     onClick={() => onOpenCitation(sec.statutoryReference)}
-                    className="text-amber-400 hover:text-amber-300 flex items-center gap-1 font-medium flex-shrink-0"
+                    className="text-gold-primary hover:text-gold-hover flex items-center gap-1 font-medium transition-colors"
                   >
                     <span>Inspect Statute</span>
-                    <ExternalLink className="h-3 w-3" />
+                    <ExternalLink className="h-3.5 w-3.5" />
                   </button>
                 </div>
               </div>
@@ -327,40 +331,43 @@ export function DocumentAnalysisView({
       {/* 3. CLAUSE RISKS & REDLINES TAB */}
       {activeSubTab === 'risks' && (
         <div className="space-y-6 animate-fade-in">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between border-b border-white/10 pb-3">
             <div>
-              <h3 className="text-base font-serif font-bold text-white flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-rose-400" />
-                Clause Risk Matrix & AI-Generated Redlines
+              <h3 className="text-xl font-serif font-bold text-white flex items-center gap-2.5">
+                <AlertTriangle className="h-5 w-5 text-rose-400" />
+                Clause Risk Matrix & Redlines
               </h3>
-              <p className="text-xs text-slate-400">
-                Detailed clause-by-clause risk severity rating, offending text, suggested redline, and statutory grounding
+              <p className="text-[14px] text-slate-400 mt-0.5">
+                Side-by-side clause risk rating, offending text, suggested redline, and statutory grounding
               </p>
             </div>
+            <span className="text-[13px] text-rose-400">
+              {document.clauseRisks?.length || 0} Clauses Flagged
+            </span>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-5">
             {document.clauseRisks.map((risk) => (
               <div 
                 key={risk.id}
-                className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 space-y-4 shadow-lg hover:border-slate-700 transition-colors"
+                className="rounded-xl border border-white/10 bg-legal-surface p-6 space-y-4 shadow-sm hover:border-white/20 transition-colors"
               >
                 {/* Header */}
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
-                  <div className="flex items-center gap-2.5">
-                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+                  <div className="flex items-center gap-3">
+                    <span className={`px-2.5 py-0.5 rounded text-xs font-mono font-bold ${
                       risk.riskLevel === 'HIGH'
-                        ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
-                        : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                        ? 'text-rose-400 bg-rose-500/10'
+                        : 'text-gold-primary bg-gold-primary/10'
                     }`}>
                       {risk.riskLevel} RISK (Score: {risk.riskScore}/100)
                     </span>
-                    <h4 className="text-sm sm:text-base font-serif font-bold text-white">
+                    <h4 className="text-lg font-serif font-bold text-white">
                       {risk.clauseName}
                     </h4>
                   </div>
-                  <span className="text-xs text-slate-400 font-medium">
-                    Category: <strong className="text-slate-300">{risk.category}</strong>
+                  <span className="text-[13px] text-slate-400">
+                    Category: <strong className="text-slate-200">{risk.category}</strong>
                   </span>
                 </div>
 
@@ -368,35 +375,34 @@ export function DocumentAnalysisView({
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   
                   {/* Current Offending Text */}
-                  <div className="rounded-xl border border-rose-500/30 bg-rose-950/20 p-4 space-y-2">
-                    <div className="flex items-center justify-between text-[11px] font-semibold text-rose-400">
+                  <div className="rounded-lg border border-rose-500/20 bg-legal-canvas p-5 space-y-2">
+                    <div className="flex items-center justify-between text-[13px] font-semibold text-rose-400">
                       <span className="flex items-center gap-1.5">
-                        <AlertTriangle className="h-3.5 w-3.5" />
+                        <AlertTriangle className="h-4 w-4" />
                         Current Offending Clause
                       </span>
-                      <span className="text-[10px] font-mono text-rose-400/80">Draft Wording</span>
                     </div>
-                    <p className="text-xs text-rose-200/90 leading-relaxed font-mono bg-slate-950/60 p-3 rounded-lg border border-rose-500/20">
+                    <p className="text-[14px] text-slate-300 leading-relaxed font-mono bg-legal-surface p-4 rounded border border-white/5">
                       "{risk.offendingText}"
                     </p>
                   </div>
 
                   {/* Suggested Redline */}
-                  <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-4 space-y-2">
-                    <div className="flex items-center justify-between text-[11px] font-semibold text-emerald-400">
+                  <div className="rounded-lg border border-emerald-500/20 bg-legal-canvas p-5 space-y-2">
+                    <div className="flex items-center justify-between text-[13px] font-semibold text-emerald-400">
                       <span className="flex items-center gap-1.5">
-                        <CheckCircle2 className="h-3.5 w-3.5" />
+                        <CheckCircle2 className="h-4 w-4" />
                         Recommended Legal Redline
                       </span>
                       <button
                         onClick={() => handleCopyText(risk.suggestedRedline, risk.id)}
-                        className="text-[10px] font-sans flex items-center gap-1 text-emerald-400 hover:text-emerald-300"
+                        className="text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-400 transition-colors"
                       >
-                        {copiedId === risk.id ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                        {copiedId === risk.id ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
                         <span>{copiedId === risk.id ? 'Copied' : 'Copy Redline'}</span>
                       </button>
                     </div>
-                    <p className="text-xs text-emerald-200/90 leading-relaxed font-mono bg-slate-950/60 p-3 rounded-lg border border-emerald-500/20">
+                    <p className="text-[14px] text-emerald-300/90 leading-relaxed font-mono bg-legal-surface p-4 rounded border border-white/5">
                       {risk.suggestedRedline}
                     </p>
                   </div>
@@ -404,17 +410,17 @@ export function DocumentAnalysisView({
                 </div>
 
                 {/* Legal Grounding Footer */}
-                <div className="rounded-xl bg-slate-950/60 border border-slate-800 p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                <div className="rounded-lg bg-legal-canvas border border-white/5 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-[13px]">
                   <div className="flex items-center gap-2 text-slate-300">
-                    <Scale className="h-3.5 w-3.5 text-amber-400 flex-shrink-0" />
-                    <span><strong>Statutory & Precedent Grounding:</strong> {risk.legalGrounding}</span>
+                    <Scale className="h-4 w-4 text-gold-primary flex-shrink-0" />
+                    <span><strong className="text-slate-200">Statutory Authority:</strong> {risk.legalGrounding}</span>
                   </div>
                   <button
                     onClick={() => onOpenCitation(risk.legalGrounding)}
-                    className="text-amber-400 hover:text-amber-300 text-[11px] font-medium flex items-center gap-1 flex-shrink-0"
+                    className="text-gold-primary hover:text-gold-hover font-medium flex items-center gap-1 transition-colors"
                   >
                     <span>View Authority</span>
-                    <ExternalLink className="h-3 w-3" />
+                    <ExternalLink className="h-3.5 w-3.5" />
                   </button>
                 </div>
 
@@ -426,47 +432,47 @@ export function DocumentAnalysisView({
 
       {/* 4. JURISTIC ENTITIES & PARTIES TAB */}
       {activeSubTab === 'entities' && (
-        <div className="space-y-4 animate-fade-in">
-          <div className="flex items-center justify-between">
+        <div className="space-y-6 animate-fade-in">
+          <div className="flex items-center justify-between border-b border-white/10 pb-3">
             <div>
-              <h3 className="text-base font-serif font-bold text-white flex items-center gap-2">
-                <Users className="h-4 w-4 text-amber-400" />
-                Extracted Juristic Entities, Claims & Metadata
+              <h3 className="text-xl font-serif font-bold text-white flex items-center gap-2.5">
+                <Users className="h-5 w-5 text-gold-primary" />
+                Parties & Entities
               </h3>
-              <p className="text-xs text-slate-400">
-                Automated Named Entity Recognition (NER) for Indian corporate entities, tribunals, dates, and amounts
+              <p className="text-[14px] text-slate-400 mt-0.5">
+                Identified corporate entities, authorities, dates, and amounts in this brief
               </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {document.entities.map((ent, idx) => (
-              <div key={idx} className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 space-y-2 hover:border-slate-700 transition-colors">
-                <div className="flex items-center justify-between">
-                  <span className="rounded bg-slate-800 px-2 py-0.5 text-[10px] font-mono text-amber-400 border border-slate-700">
+              <div key={idx} className="rounded-xl border border-white/10 bg-legal-surface p-5 space-y-2.5 hover:border-white/20 transition-colors">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-mono font-medium text-gold-primary uppercase">
                     {ent.type}
                   </span>
                   {ent.status && (
-                    <span className="text-[10px] font-medium text-rose-400 bg-rose-500/10 px-1.5 py-0.5 rounded">
+                    <span className="text-rose-400 font-mono">
                       {ent.status}
                     </span>
                   )}
                 </div>
 
-                <div className="font-serif font-bold text-sm text-white pt-1">
+                <div className="font-serif font-bold text-[16px] text-white pt-1">
                   {ent.name}
                 </div>
 
                 {ent.location && (
-                  <div className="text-xs text-slate-400 flex items-center gap-1.5">
-                    <MapPin className="h-3.5 w-3.5 text-slate-500" />
+                  <div className="text-[13px] text-slate-400 flex items-center gap-1.5">
+                    <MapPin className="h-4 w-4 text-slate-500" />
                     <span>{ent.location}</span>
                   </div>
                 )}
 
                 {ent.cin && (
-                  <div className="text-[11px] font-mono text-slate-400 pt-1">
-                    CIN: <span className="text-slate-300">{ent.cin}</span>
+                  <div className="text-[13px] font-mono text-slate-400 pt-1">
+                    CIN: <span className="text-slate-200">{ent.cin}</span>
                   </div>
                 )}
               </div>
@@ -480,88 +486,88 @@ export function DocumentAnalysisView({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-in">
           
           {/* Left: Simulated PDF text reader with highlighted clauses */}
-          <div className="lg:col-span-7 rounded-2xl border border-slate-800 bg-slate-950 p-6 space-y-4 shadow-xl max-h-[650px] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <div className="flex items-center gap-2">
-                <FileText className="h-4 w-4 text-amber-400" />
-                <span className="font-serif font-bold text-xs text-slate-200">
-                  Simulated Document Transcript ({document.pages} Pages)
+          <div className="lg:col-span-7 rounded-xl border border-white/10 bg-legal-surface p-6 space-y-4 shadow-sm max-h-[680px] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2.5">
+                <FileText className="h-5 w-5 text-gold-primary" />
+                <span className="font-serif font-bold text-[15px] text-slate-200">
+                  Document Transcript ({document.pages} Pages)
                 </span>
               </div>
-              <span className="text-[11px] font-mono text-slate-500">
-                Click highlighted text to inspect AI analysis
+              <span className="text-[13px] text-slate-400">
+                Indexed Text
               </span>
             </div>
 
-            <div className="font-serif text-xs leading-relaxed text-slate-300 whitespace-pre-wrap space-y-4">
-              <div className="p-4 rounded-xl bg-slate-900/40 border border-slate-800/80 text-slate-200">
+            <div className="font-serif text-[14px] leading-[1.7] text-slate-300 whitespace-pre-wrap space-y-4">
+              <div className="p-5 rounded-lg bg-legal-canvas border border-white/5 text-slate-200 leading-relaxed font-mono text-[13px]">
                 {document.rawText}
               </div>
             </div>
 
-            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300 flex items-center gap-2">
-              <Info className="h-4 w-4 flex-shrink-0" />
-              <span>Full optical OCR scan synchronized with Indian Case Law knowledge graph.</span>
+            <div className="p-4 rounded-lg bg-white/5 border border-white/5 text-[13px] text-slate-300 flex items-center gap-2.5">
+              <Info className="h-4 w-4 text-gold-primary flex-shrink-0" />
+              <span>Full text indexed and cross-referenced with Central Bare Acts.</span>
             </div>
           </div>
 
           {/* Right: Live Selected Clause Inspector */}
           <div className="lg:col-span-5 space-y-4">
-            <div className="rounded-2xl border border-amber-500/40 bg-slate-900/80 p-5 space-y-4 sticky top-20 shadow-xl">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                <span className="text-xs font-serif font-bold text-amber-300 flex items-center gap-1.5">
-                  <Scale className="h-4 w-4 text-amber-400" />
-                  Live Statutory Annotator
+            <div className="rounded-xl border border-gold-primary/30 bg-legal-surface p-6 space-y-4 sticky top-24 shadow-sm">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <span className="text-[15px] font-serif font-bold text-slate-200 flex items-center gap-2">
+                  <Scale className="h-4 w-4 text-gold-primary" />
+                  Statutory Annotator
                 </span>
-                <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                  Real-time Grounding
+                <span className="text-xs text-emerald-400">
+                  Grounded
                 </span>
               </div>
 
               {document.clauseRisks && document.clauseRisks.length > 0 ? (
-                <div className="space-y-4 text-xs">
+                <div className="space-y-4 text-[14px]">
                   <div className="space-y-1">
-                    <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                    <div className="text-xs font-mono font-semibold text-slate-400 uppercase tracking-wider">
                       Flagged Clause:
                     </div>
-                    <div className="text-sm font-serif font-bold text-white">
+                    <div className="text-[16px] font-serif font-bold text-white">
                       {document.clauseRisks[0].clauseName}
                     </div>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-rose-950/30 border border-rose-500/30 text-rose-200">
-                    <div className="text-[10px] font-bold uppercase text-rose-400 mb-1">
+                  <div className="p-4 rounded-lg bg-legal-canvas border border-rose-500/25 text-rose-200 space-y-1">
+                    <div className="text-xs font-mono font-bold uppercase text-rose-400">
                       Problematic Text:
                     </div>
-                    <p className="font-mono text-[11px] leading-relaxed">
+                    <p className="font-mono text-[13px] leading-relaxed">
                       "{document.clauseRisks[0].offendingText}"
                     </p>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/30 text-emerald-200">
-                    <div className="text-[10px] font-bold uppercase text-emerald-400 mb-1">
+                  <div className="p-4 rounded-lg bg-legal-canvas border border-emerald-500/25 text-emerald-200 space-y-1">
+                    <div className="text-xs font-mono font-bold uppercase text-emerald-400">
                       Suggested Indian Law Redline:
                     </div>
-                    <p className="font-mono text-[11px] leading-relaxed">
+                    <p className="font-mono text-[13px] leading-relaxed">
                       {document.clauseRisks[0].suggestedRedline}
                     </p>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-300">
-                    <div className="text-[10px] font-bold uppercase text-amber-400 mb-1">
-                      Supreme Court Ruling Grounding:
+                  <div className="p-4 rounded-lg bg-legal-canvas border border-white/5 text-slate-300 space-y-1">
+                    <div className="text-xs font-mono font-bold uppercase text-gold-primary">
+                      Supreme Court Precedent Grounding:
                     </div>
-                    <p className="text-[11px] leading-relaxed">
+                    <p className="text-[13px] leading-relaxed">
                       {document.clauseRisks[0].legalGrounding}
                     </p>
                   </div>
 
                   <button
                     onClick={() => onNavigateToChat(document)}
-                    className="w-full py-2.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs hover:bg-amber-400 transition-colors flex items-center justify-center gap-2 shadow-md"
+                    className="w-full py-3 rounded-lg bg-gold-primary text-[#070B14] font-semibold text-[14px] hover:bg-gold-hover transition-colors flex items-center justify-center gap-2 shadow-sm"
                   >
                     <Sparkles className="h-4 w-4" />
-                    <span>Ask AI About This Clause</span>
+                    <span>Interrogate Clause in AI Chat</span>
                   </button>
                 </div>
               ) : null}
@@ -575,3 +581,5 @@ export function DocumentAnalysisView({
     </div>
   );
 }
+
+export default DocumentAnalysisView;

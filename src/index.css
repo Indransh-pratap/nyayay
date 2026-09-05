@@ -3,62 +3,100 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    font-size: 15px;
+  }
   body {
-    @apply bg-[#070D1B] text-slate-100 font-sans;
+    @apply bg-[#070B14] text-[#F5F7FA] font-sans antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    text-rendering: optimizeLegibility;
+    line-height: 1.6;
   }
 
-  /* Custom scrollbar for legal document reading */
+  /* Refined custom scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.6);
+    background: #070B14;
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(100, 116, 139, 0.4);
-    border-radius: 9999px;
+    background: rgba(100, 116, 139, 0.25);
+    border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(212, 175, 55, 0.6);
+    background: rgba(217, 164, 65, 0.4);
   }
 }
 
-.legal-gold-gradient {
-  background: linear-gradient(135deg, #D4AF37 0%, #F3E5AB 50%, #AA7C11 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Premium Indian Legal Workspace Utilities */
+.reading-container {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.legal-card {
+  background-color: #0D1320;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  transition: all 150ms ease;
+}
+
+.legal-card-interactive {
+  background-color: #0D1320;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  transition: all 150ms ease;
+}
+.legal-card-interactive:hover {
+  background-color: #121A29;
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.legal-card-active {
+  background-color: #121A29;
+  border: 1px solid rgba(217, 164, 65, 0.4);
+}
+
+.legal-gold-text {
+  color: #D9A441;
+}
+
+.legal-gold-subtle-bg {
+  background-color: rgba(217, 164, 65, 0.08);
+  border: 1px solid rgba(217, 164, 65, 0.25);
+}
+
+.legal-border {
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .legal-border-gold {
-  border-image: linear-gradient(to right, #d4af37, #f59e0b, #d4af37) 1;
+  border-color: rgba(217, 164, 65, 0.35);
+}
+
+/* Restrained glass surfaces for sticky header & inspector */
+.glass-header {
+  background: rgba(7, 11, 20, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .glass-panel {
-  background: rgba(15, 23, 42, 0.75);
+  background: rgba(13, 19, 32, 0.82);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.glass-panel-gold {
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(212, 175, 55, 0.25);
-}
-
-.parchment-light {
-  background-color: #FAF9F6;
-  color: #1A202C;
-}
-
 /* Print/export styles */
 @media print {
   body {
-    background: white;
-    color: black;
+    background: white !important;
+    color: #0F172A !important;
   }
   .no-print {
     display: none !important;
